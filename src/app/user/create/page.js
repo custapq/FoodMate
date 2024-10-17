@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import InputSelect from "../../../components/InputCheckBox";
 import InputRadio from "../../../components/InputRadio";
 import InputText from "../../../components/InputText";
+import InputSelect from "../../../components/InputSelect";
 import Button from "../../../components/Button";
 
 // Fetch conditions from API
@@ -47,6 +47,8 @@ export default function Create() {
   const [exercise, setExercise] = useState(Exercise.NONE);
 
   const [conditions, setConditions] = useState([]);
+  const [condition, setCondition] = useState([9]); // ตั้งค่า default condition เป็น id=9 ("ไม่เป็นโรค")
+  const [hasCondition, setHasCondition] = useState(false); // เริ่มต้นเป็น false แปลว่า "ไม่เป็นโรค"
   const [loadingCondition, setLoadingCondition] = useState(true);
 
   useEffect(() => {
@@ -63,6 +65,16 @@ export default function Create() {
     getConditions();
   }, []);
 
+  const handleConditionChange = (conditionId) => {
+    if (condition.includes(conditionId)) {
+      // ถ้า conditionId มีอยู่แล้วให้ลบออก
+      setCondition(condition.filter((id) => id !== conditionId));
+    } else {
+      // ถ้าไม่มี ให้เพิ่มเข้าไป
+      setCondition([...condition, conditionId]);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -73,6 +85,7 @@ export default function Create() {
       gender,
       goal,
       exercise,
+      condition, // ส่ง condition ที่ถูกเลือก (default = 9)
     };
 
     try {
@@ -91,7 +104,7 @@ export default function Create() {
       const data = await res.json();
       console.log("User created:", data);
 
-      const userId = data.id; 
+      const userId = data.id;
 
       router.push(`/recommendation/${userId}`);
     } catch (error) {
@@ -144,14 +157,57 @@ export default function Create() {
         />
       </div>
 
-      {!loadingCondition ? (
-        <InputSelect
-          label="Select your condition"
-          id="condition"
-          options={conditions.map((condition) => condition.name)}
-        />
-      ) : (
-        <p>Loading conditions...</p>
+      {/* ส่วนที่เลือกว่าจะมีโรคหรือไม่ */}
+      <div className="mt-4">
+        <label>คุณมีโรคประจำตัวหรือไม่?</label>
+        <div className="flex space-x-4 mt-2">
+          <InputRadio
+            id="hasConditionYes"
+            name="hasCondition"
+            value={true}
+            checked={hasCondition === true}
+            onChange={() => {
+              setHasCondition(true);
+              setCondition([]); // ถ้าผู้ใช้เลือกว่าจะเป็นโรค จะรีเซ็ต condition เป็นค่าว่าง
+            }}
+            label="มี"
+          />
+          <InputRadio
+            id="hasConditionNo"
+            name="hasCondition"
+            value={false}
+            checked={hasCondition === false}
+            onChange={() => {
+              setHasCondition(false);
+              setCondition([9]); // ถ้าเลือกว่าไม่มีโรค ตั้งค่าเป็น 9 ("ไม่เป็นโรค")
+            }}
+            label="ไม่มี"
+          />
+        </div>
+      </div>
+
+      {/* แสดงรายการโรค ถ้าเลือกว่ามีโรค */}
+      {hasCondition && !loadingCondition && (
+        <div className="mt-4">
+          <label>เลือกโรคประจำตัวของคุณ:</label>
+          {conditions
+            .filter((conditionItem) => conditionItem.id !== 9)
+            .map((conditionItem) => (
+              <div key={conditionItem.id} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`condition-${conditionItem.id}`}
+                  value={conditionItem.id}
+                  checked={condition.includes(conditionItem.id)}
+                  onChange={() => handleConditionChange(conditionItem.id)}
+                  className="mr-2"
+                />
+                <label htmlFor={`condition-${conditionItem.id}`}>
+                  {conditionItem.name}
+                </label>
+              </div>
+            ))}
+        </div>
       )}
 
       <InputSelect

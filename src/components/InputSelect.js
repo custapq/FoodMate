@@ -1,5 +1,4 @@
-// InputSelect.js
-export default function InputCheckBox({ label, id, options, ...props }) {
+export default function InputSelect({ label, id, options, ...props }) {
   return (
     <div className="mb-5">
       <label

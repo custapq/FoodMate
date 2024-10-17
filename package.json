@@ -12,6 +12,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.2",
+    "dotenv": "^16.4.5",
     "my-app": "file:",
     "next": "14.2.14",
     "react": "^18",

@@ -9,7 +9,10 @@ import {
 } from "../util/calculate.js";
 
 const UserInfo = ({ userData }) => {
-  const { id, age, weight, height, gender, exercise, goal } = userData;
+  const { id, age, weight, height, gender, exercise, goal, conditionList } =
+    userData;
+
+  console.log("user condition: ", conditionList.length);
 
   // Perform calculations
   const ibw = calculateIBW(height, gender);
@@ -101,6 +104,15 @@ const UserInfo = ({ userData }) => {
             value={`${exercise} `}
             detail="การออกกำลังกาย"
           />
+          {conditionList.map((conditions) => (
+            <Card
+              key={conditions.id}
+              title="โรคประจำตัว"
+              value={conditions.condition.name}
+              detail="โรคประจำตัว"
+            />
+          ))}
+
           <Card title="เป้าหมาย" value={`${goal} `} detail="เป้าหมาย" />
         </div>
       </div>

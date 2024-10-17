@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 
 const useUserData = (userId) => {
@@ -8,11 +9,12 @@ const useUserData = (userId) => {
   const fetchUser = async () => {
     if (!userId) {
       setLoading(false);
-      return; 
+      return;
     }
-
     try {
-      const res = await fetch(`http://localhost:3000/api/user/${userId}`);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${userId}`
+      );
       if (!res.ok) {
         throw new Error("Failed to fetch user data");
       }
