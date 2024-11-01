@@ -1,20 +1,18 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import Button from "./Button";
 
-export default async function Header() {
-  // const data = await signOut({redirect: false, callbackUrl: "/fo"})
-
+export default function Header() {
   return (
-    <header className="w-full p-4 bg-white shadow-sm">
-      <div className="container mx-auto flex justify-end">
-        <Button
-          onClick={() => signOut({ callbackUrl: `/` })}
-          className="bg-red-500 hover:bg-red-600 text-white"
+    <header className="w-full py-4 bg-white border-b mb-2">
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        <h1 className="text-xl font-medium">FoodMate</h1>
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="text-gray-600 hover:text-gray-800 text-sm transition-colors duration-200"
         >
-          Sign Out
-        </Button>
+          ออกจากระบบ
+        </button>
       </div>
     </header>
   );

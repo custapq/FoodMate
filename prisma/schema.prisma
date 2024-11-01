@@ -66,7 +66,7 @@ model FoodRecommendation {
 model Food {
   id                 Int                  @id @default(autoincrement())
   thaiName           String
-  englishName        String
+  englishName        String?
   imageURL           String?
   nutrientList       NutrientList[]
   foodRecommendation FoodRecommendation[]

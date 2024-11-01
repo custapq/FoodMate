@@ -69,10 +69,10 @@ const RecommendationPage = ({ params }) => {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  console.log("session.user.id", session.user.id);
-  console.log("id", id);
-  console.log("parseInt(id)", parseInt(id));
-  console.log("status", status);
+  // console.log("session.user.id", session.user.id);
+  // console.log("id", id);
+  // console.log("parseInt(id)", parseInt(id));
+  // console.log("status", status);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -148,8 +148,11 @@ const RecommendationPage = ({ params }) => {
   const selectedFoodEnergy = calculateSelectedFoodsEnergy();
   const updatedEnergy = currentEnergy + selectedFoodEnergy;
 
-  const currentProgress = (currentEnergy / tdee) * 100;
-  const selectedProgress = (selectedFoodEnergy / tdee) * 100;
+  const displayCurrentProgress = Math.min((currentEnergy / tdee) * 100, 100);
+  const displaySelectedProgress = Math.min(
+    ((currentEnergy + selectedFoodEnergy) / tdee) * 100,
+    100
+  );
 
   const isLoading = loading || loadingFood || !userData || !foodsData;
 
@@ -163,7 +166,7 @@ const RecommendationPage = ({ params }) => {
     setSelectedFoods((prev) => {
       if (prev.includes(foodId)) {
         // ถ้ามี foodId อยู่แล้ว ให้ลบออก
-        return prev.filter(id => id !== foodId);
+        return prev.filter((id) => id !== foodId);
       } else {
         // ถ้ายังไม่มี foodId ให้เพิ่มเข้าไป
         return [...prev, foodId];
@@ -202,48 +205,81 @@ const RecommendationPage = ({ params }) => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen">
+    <div className="flex flex-col items-center min-h-screen pb-28">
       <div className="container mx-auto flex items-center justify-between">
         <span>พลังงานวันนี้</span>
-        <span>
+        <span
+          className={updatedEnergy > tdee ? "text-red-500 font-medium" : ""}
+        >
           {updatedEnergy} / {Math.round(tdee)} kcal
         </span>
       </div>
       <div className="container mx-auto mt-2">
         <div className="bg-gray-200 rounded-full h-4 relative">
           <div
-            className="absolute bg-green-400 h-4 transition-all duration-300 ease-in-out"
-            style={{ width: `${currentProgress}%` }}
+            className={`absolute h-4 transition-all duration-300 ease-in-out ${
+              currentEnergy > tdee ? "bg-red-500" : "bg-green-400"
+            }`}
+            style={{ width: `${displayCurrentProgress}%` }}
           ></div>
           <div
-            className="absolute bg-yellow-400 h-4 transition-all duration-300 ease-in-out"
+            className={`absolute h-4 transition-all duration-300 ease-in-out ${
+              updatedEnergy > tdee ? "bg-red-300" : "bg-yellow-400"
+            }`}
             style={{
-              width: `${selectedProgress}%`,
-              left: `${currentProgress}%`,
+              width: `${displaySelectedProgress - displayCurrentProgress}%`,
+              left: `${displayCurrentProgress}%`,
             }}
           ></div>
         </div>
       </div>
+      {updatedEnergy > tdee && (
+        <div className="container mx-auto mt-2">
+          <p className="text-red-500 text-sm">
+            ⚠️ พลังงานที่ได้รับเกินปริมาณที่แนะนำต่อวัน
+          </p>
+        </div>
+      )}
 
       <div className="p-1 w-full max-w-6xl mx-auto">
-        <div className="w-full overflow-x-auto my-5">
-          <h3>Selected Foods:</h3>
-          <div className="flex space-x-4">
-            {selectedFoods.map((foodId) => {
-              const selectedFood = foodData.find((food) => food.id === foodId);
-              return selectedFood ? (
-                <FoodCard key={foodId} food={selectedFood} />
-              ) : null;
-            })}
-          </div>
-          {selectedFoods.length > 0 && (
-            <Button type="button" onClick={handleClearAll}>
-              Clear All
-            </Button>
-          )}
-        </div>
+        {selectedFoods.length > 0 && (
+          <div className="w-full my-5">
+            <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
+              อาหารที่เลือก
+            </h2>
+            <div className="flex space-x-4 overflow-x-auto mb-4">
+              {selectedFoods.map((foodId) => {
+                const selectedFood = foodData.find(
+                  (food) => food.id === foodId
+                );
+                return selectedFood ? (
+                  <FoodCard key={foodId} food={selectedFood} />
+                ) : null;
+              })}
+            </div>
 
-        <h3>อาหารทั้งหมด</h3>
+            {selectedFoods.length > 0 && (
+              <div className="flex justify-between gap-4 mt-4 mb-8">
+                <button
+                  onClick={handleClearAll}
+                  className="flex-1 py-2 px-4 text-gray-600 hover:text-red-600 transition-colors duration-200 border border-red-600 rounded-lg"
+                >
+                  ล้างรายการทั้งหมด
+                </button>
+                <button
+                  onClick={handleButtonSelect}
+                  className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+                >
+                  ยืนยันรายการอาหาร ({selectedFoods.length})
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
+          อาหารทั้งหมด
+        </h2>
         <div className="w-full overflow-x-auto">
           <div className="flex space-x-4">
             {foodData.map((food) => (
@@ -258,12 +294,14 @@ const RecommendationPage = ({ params }) => {
           </div>
         </div>
 
-        <h3>กับข้าว</h3>
+        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
+          อาหารประเภทผัด
+        </h2>
         <div className="w-full overflow-x-auto">
           <div className="flex space-x-4">
             {foodData
               .filter((food) =>
-                food.foodTagList.some((tag) => tag.foodTag.id === 2)
+                food.foodTagList.some((tag) => tag.foodTag.id === 10)
               )
               .map((food) => (
                 <div
@@ -277,7 +315,30 @@ const RecommendationPage = ({ params }) => {
           </div>
         </div>
 
-        <h3>ก๋วยเตี๊ยว</h3>
+        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
+          อาหารประเภทแกง
+        </h2>
+        <div className="w-full overflow-x-auto">
+          <div className="flex space-x-4">
+            {foodData
+              .filter((food) =>
+                food.foodTagList.some((tag) => tag.foodTag.id === 7)
+              )
+              .map((food) => (
+                <div
+                  key={food.id}
+                  onClick={() => handleFoodClick(food.id)}
+                  className="cursor-pointer hover:scale-105 transition-transform"
+                >
+                  <FoodCard food={food} />
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
+          ก๋วยเตี๋ยว
+        </h2>
         <div className="w-full overflow-x-auto">
           <div className="flex space-x-4">
             {foodData
@@ -296,7 +357,9 @@ const RecommendationPage = ({ params }) => {
           </div>
         </div>
 
-        <h3>อาหารจานเดียว</h3>
+        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
+          อาหารจานเดียว
+        </h2>
         <div className="w-full overflow-x-auto">
           <div className="flex space-x-4">
             {foodData
@@ -313,16 +376,6 @@ const RecommendationPage = ({ params }) => {
                 </div>
               ))}
           </div>
-        </div>
-
-        <div className="grid grid-rows-1 gap-2 mt-4">
-          <Button
-            type="button"
-            onClick={handleButtonSelect}
-            disabled={selectedFoods.length === 0}
-          >
-            Select
-          </Button>
         </div>
       </div>
     </div>

@@ -71,12 +71,42 @@ export default function Create() {
     }
   };
 
+  const validateAge = (age) => {
+    const ageNum = Number(age);
+    return ageNum >= 1 && ageNum <= 120;
+  };
+
+  const validateWeight = (weight) => {
+    const weightNum = Number(weight);
+    return weightNum >= 20 && weightNum <= 300;
+  };
+
+  const validateHeight = (height) => {
+    const heightNum = Number(height);
+    return heightNum >= 50 && heightNum <= 250;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const userId = localStorage.getItem("userId"); // ดึง userId จาก localStorage
+    if (!validateAge(age)) {
+      setError("กรุณาระบุอายุที่ถูกต้อง (1-120 ปี)");
+      return;
+    }
+
+    if (!validateWeight(weight)) {
+      setError("กรุณาระบุน้ำหนักที่ถูกต้อง (20-300 กิโลกรัม)");
+      return;
+    }
+
+    if (!validateHeight(height)) {
+      setError("กรุณาระบุส่วนสูงที่ถูกต้อง (50-250 เซนติเมตร)");
+      return;
+    }
+
+    const userId = localStorage.getItem("userId");
     const userData = {
-      userId: Number(userId), // แปลง userId เป็นหมายเลข
+      userId: Number(userId),
       age,
       weight,
       height,
@@ -92,7 +122,7 @@ export default function Create() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData), // ส่งข้อมูลผู้ใช้ไปยัง API
+        body: JSON.stringify(userData),
       });
 
       if (!res.ok) {
@@ -102,7 +132,7 @@ export default function Create() {
       const data = await res.json();
       console.log("User details created:", data);
 
-      router.push(`/recommendation/${userId}`); // เปลี่ยนเส้นทางไปหน้าคำแนะนำ
+      router.push(`/recommendation/${userId}`);
     } catch (error) {
       setError(error.message);
       console.error("Error submitting form:", error);

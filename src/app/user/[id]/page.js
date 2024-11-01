@@ -29,11 +29,23 @@ export default function UserPage({ params }) {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="flex-grow">
-        <UserInfo userData={userData} />
+    <div className="flex flex-col items-center min-h-screen pb-28">
+      <div className="p-4 w-full max-w-6xl">
+        <h1 className="text-2xl font-bold mb-6 pb-2 border-b-2 border-orange-500">
+          ข้อมูลผู้ใช้
+        </h1>
+        <div className="flex-grow">
+          <UserInfo userData={userData} />
+        </div>
+        <div className="mt-6">
+          <Button 
+            onClick={() => router.push(`/edit/${id}`)}
+            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+          >
+            แก้ไขข้อมูล
+          </Button>
+        </div>
       </div>
-      <Button onClick={() => router.push(`/edit/${id}`)}>แก้ไขข้อมูล</Button>
     </div>
   );
 }
