@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password       String?
+  age            Int?
+  weight         Int?
+  height         Int?
+  gender         Gender?
+  goal           Goal?
+  exercise       Exercise?
+  conditionList  ConditionList[]
+  recommendation Recommendation[]
+
+  @@map("user")
+}
+
+model ConditionList {
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  conditionId Int
+  condition   Condition @relation(fields: [conditionId], references: [id])
+
+  @@id([userId, conditionId])
+  @@map("conditionList")
+}
+
+model Condition {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  conditionList ConditionList[]
+
+  @@map("condition")
+}
+
+model Recommendation {
+  id                 Int                  @id @default(autoincrement())
+  userId             Int
+  user               User                 @relation(fields: [userId], references: [id])
+  timeStamp          DateTime             @default(now())
+  foodRecommendation FoodRecommendation[]
+
+  @@map("recommendation")
+}
+
+model FoodRecommendation {
+  recommendationId Int
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id])
+  sequence         Int
+  foodId           Int
+  food             Food           @relation(fields: [foodId], references: [id])
+
+  @@id([recommendationId, sequence])
+  @@map("foodRecommendation")
+}
+
+model Food {
+  id                 Int                  @id @default(autoincrement())
+  thaiName           String
+  englishName        String
+  imageURL           String?
+  nutrientList       NutrientList[]
+  foodRecommendation FoodRecommendation[]
+  foodTagList        FoodTagList[]
+
+  @@map("food")
+}
+
+model FoodTagList {
+  foodId  Int
+  food    Food    @relation(fields: [foodId], references: [id])
+  tagId   Int
+  foodTag FoodTag @relation(fields: [tagId], references: [id])
+
+  @@id([foodId, tagId])
+  @@map("foodTagList")
+}
+
+model FoodTag {
+  id          Int           @id @default(autoincrement())
+  name        String
+  foodTagList FoodTagList[]
+
+  @@map("foodTag")
+}
+
+model NutrientList {
+  foodId     Int
+  nutrientId Int
+  food       Food     @relation(fields: [foodId], references: [id])
+  nutrient   Nutrient @relation(fields: [nutrientId], references: [id])
+  amount     Float
+  unit       String
+
+  @@id([foodId, nutrientId])
+  @@map("nutrientList")
+}
+
+model Nutrient {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  nutrientList NutrientList[]
+
+  @@map("nutrient")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Goal {
+  GENERAL
+  GAINWEIGHT
+  WEIGHTMAINTAIN
+  LOSSWEIGHT
+}
+
+enum Exercise {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  SPORTMAN
+}
