@@ -69,21 +69,21 @@ export default function StatPage({ params }) {
   const groupedData = groupByDate(filteredData); // จัดกลุ่มข้อมูลที่กรองแล้ว
 
   return (
-    <div className="flex justify-center min-h-screen pt-12">
-      <div className="p-4 w-full max-w-3xl">
-        <h1 className="text-2xl font-bold mb-4">
-          หน้าสถิติสำหรับผู้ใช้ ID: {id}
+    <div className="flex justify-center min-h-screen pb-28">
+      <div className="p-4 w-full max-w-6xl">
+        <h1 className="text-2xl font-bold mb-6 pb-2">
+          ประวัติการแนะนำอาหาร
         </h1>
 
-        <div className="mb-4">
-          <label htmlFor="timeFilter" className="mr-2">
+        <div className="mb-6">
+          <label htmlFor="timeFilter" className="text-lg font-medium mr-3">
             กรองตาม:
           </label>
           <select
             id="timeFilter"
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
-            className="border rounded p-1"
+            className="border rounded-lg p-2 bg-white shadow-sm"
           >
             <option value="all">ทั้งหมด</option>
             <option value="today">วันนี้</option>
@@ -92,32 +92,36 @@ export default function StatPage({ params }) {
           </select>
         </div>
 
-        <h2 className="text-xl font-semibold mb-4">รายการอาหารที่แนะนำ:</h2>
         {Object.keys(groupedData).length > 0 ? (
           Object.keys(groupedData).map((date) => (
-            <div key={date} className="mb-8 border-b pb-4">
+            <div key={date} className="mb-8">
               <h3
                 onClick={() => toggleDate(date)}
-                className="text-lg font-medium mb-2 cursor-pointer"
+                className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500 cursor-pointer flex items-center"
               >
-                {date}
+                <span>{date}</span>
+                <span className="ml-2 text-gray-500">
+                  {openRecDate === date ? '▼' : '▶'}
+                </span>
               </h3>
               {openRecDate === date &&
                 groupedData[date].map((rec) => (
-                  <div key={rec.id} className="mb-4">
-                    <h4 className="text-md font-medium mb-2">
+                  <div key={rec.id} className="mb-6 bg-white rounded-lg p-4 shadow-sm">
+                    <h4 className="text-lg font-medium mb-3 text-gray-700">
                       เวลา {formatTime(rec.timeStamp)}
                     </h4>
-                    <div className="flex gap-4 overflow-x-auto">
+                    <div className="flex gap-4 overflow-x-auto pb-2">
                       {rec.foodRecommendation &&
                       rec.foodRecommendation.length > 0 ? (
                         rec.foodRecommendation.map((data) => (
-                          <div key={data.foodId} className="w-48 mx-5">
+                          <div key={data.foodId} className="w-60">
                             <FoodCard food={data.food} />
                           </div>
                         ))
                       ) : (
-                        <div>ไม่มีคำแนะนำอาหารสำหรับรายการนี้</div>
+                        <div className="text-gray-500">
+                          ไม่มีคำแนะนำอาหารสำหรับรายการนี้
+                        </div>
                       )}
                     </div>
                   </div>
@@ -125,10 +129,11 @@ export default function StatPage({ params }) {
             </div>
           ))
         ) : (
-          <div>ไม่พบคำแนะนำสำหรับช่วงเวลาที่เลือก</div>
+          <div className="text-center text-gray-500 py-8">
+            ไม่พบคำแนะนำสำหรับช่วงเวลาที่เลือก
+          </div>
         )}
       </div>
-      
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import InputText from "../../components/InputText"; // Import InputText component
 import Button from "@/components/Button"; // Import Button component
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export default function Signup() {
   const router = useRouter();
@@ -69,32 +70,42 @@ export default function Signup() {
 
   return (
     <div className="max-w-xl mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-5">Signup</h2>
+      <h2 className="text-2xl font-bold mb-5">สมัครสมาชิก</h2>
       {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={handleSignup}>
         <InputText
-          label="Email"
+          label="อีเมล"
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <InputText
-          label="Password"
+          label="รหัสผ่าน"
           id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
         <InputText
-          label="Confirm Password"
+          label="ยืนยันรหัสผ่าน"
           id="confirmPassword"
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
-        <Button type="submit">Sign Up</Button>
+        <Button type="submit" className="w-full">
+          สมัครสมาชิก
+        </Button>
       </form>
+      <div className="mt-4 text-center">
+        <p>
+          มีบัญชีอยู่แล้ว?{" "}
+          <Link href="/signin" className="text-blue-600 hover:text-blue-800">
+            เข้าสู่ระบบ
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
