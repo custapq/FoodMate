@@ -106,7 +106,7 @@ const UserInfo = ({ userData }) => {
           />
           {conditionList.map((conditions) => (
             <Card
-              key={conditions.id}
+              key={conditions.conditionId}
               title="โรคประจำตัว"
               value={conditions.condition.name}
               detail="โรคประจำตัว"

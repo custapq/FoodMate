@@ -1,4 +1,3 @@
-// InputText.js
 export default function InputText({ label, id, ...props }) {
   return (
     <div className="relative z-0 w-full mb-5 group">
