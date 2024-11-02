@@ -1,26 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
-const FoodCard = ({ food }) => {
-  // const [image, setImage] = useState(null);
+const FoodCard = ({ food, favorites = [], onToggleFavorite }) => {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+  
+  const isFavorite = food && favorites?.some(fav => fav.foodId === food.id);
 
-  // useEffect(() => {
-  //   if (food.imageURL) {
-  //     setImage(food.imageURL);
-  //   }
-  // }, [food.imageURL]);
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+    if (!userId) return;
 
-  if (!food) {
-    return <div>Loading...</div>;
-  }
+    if (isFavorite) {
+      if (window.confirm('ต้องการลบอาหารนี้ออกจากรายการโปรดใช่หรือไม่?')) {
+        await onToggleFavorite(food.id);
+      }
+    } else {
+      if (window.confirm('ต้องการเพิ่มอาหารนี้ไปยังรายการโปรดใช่หรือไม่?')) {
+        await onToggleFavorite(food.id);
+      }
+    }
+  };
+
+  if (!food) return <div>Loading...</div>;
 
   const { thaiName, englishName, imageURL, nutrientList, foodTagList } = food;
-  // console.log("Image URL:", imageURL);
   const energy = nutrientList.find((item) => item.nutrientId === 1);
+
   return (
-    <div
-      className="border border-gray-200 rounded-lg shadow-md p-4
-      w-60 h-92 sm:w-60 sm:h-92 mx-4"
-    >
+    <div className="border border-gray-200 rounded-lg shadow-md p-4 w-60 h-92 sm:w-60 sm:h-92 mx-4 relative">
+      <button 
+        onClick={handleFavoriteClick}
+        className="absolute top-2 right-2 z-10 p-2 text-red-500 hover:text-red-600"
+      >
+        {isFavorite ? <FaHeart size={20} /> : <FaRegHeart size={20} />}
+      </button>
+      
       <img
         src={imageURL}
         alt={thaiName}

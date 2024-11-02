@@ -19,6 +19,7 @@ model User {
   exercise       Exercise?
   conditionList  ConditionList[]
   recommendation Recommendation[]
+  FavoriteFood   FavoriteFood[]
 
   @@map("user")
 }
@@ -71,8 +72,19 @@ model Food {
   nutrientList       NutrientList[]
   foodRecommendation FoodRecommendation[]
   foodTagList        FoodTagList[]
+  FavoriteFood       FavoriteFood[]
 
   @@map("food")
+}
+
+model FavoriteFood {
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+  foodId Int
+  food   Food @relation(fields: [foodId], references: [id])
+
+  @@id([userId, foodId])
+  @@map("favoriteFood")
 }
 
 model FoodTagList {

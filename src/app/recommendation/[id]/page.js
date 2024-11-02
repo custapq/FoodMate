@@ -9,6 +9,7 @@ import FoodCard from "@/components/FoodCard";
 import Button from "@/components/Button";
 import useTodayRecommendation from "@/hooks/useTodayRecommendation";
 import { useSession } from "next-auth/react";
+import useFavorites from "@/hooks/useFavorites";
 
 import { calculateBMR, calculateTDEE } from "@/util/calculate";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -68,6 +69,7 @@ const RecommendationPage = ({ params }) => {
   const { id } = params;
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { favorites, toggleFavorite } = useFavorites(parseInt(id));
 
   // console.log("session.user.id", session.user.id);
   // console.log("id", id);
@@ -288,9 +290,38 @@ const RecommendationPage = ({ params }) => {
                 onClick={() => handleFoodClick(food.id)}
                 className="cursor-pointer hover:scale-105 transition-transform"
               >
-                <FoodCard food={food} />
+                <FoodCard 
+                  food={food} 
+                  favorites={favorites}
+                  onToggleFavorite={toggleFavorite}
+                />
               </div>
             ))}
+          </div>
+        </div>
+
+        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
+          อาหารที่ชื่นชอบ
+        </h2>
+        <div className="w-full overflow-x-auto">
+          <div className="flex space-x-4">
+            {favorites.length > 0 ? (
+              favorites.map((favorite) => (
+                <div
+                  key={favorite.foodId}
+                  onClick={() => handleFoodClick(favorite.foodId)}
+                  className="cursor-pointer hover:scale-105 transition-transform"
+                >
+                  <FoodCard 
+                    food={favorite.food} 
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 py-4">ยังไม่มีอาหารที่ชื่นชอบ</p>
+            )}
           </div>
         </div>
 
@@ -309,7 +340,11 @@ const RecommendationPage = ({ params }) => {
                   onClick={() => handleFoodClick(food.id)}
                   className="cursor-pointer hover:scale-105 transition-transform"
                 >
-                  <FoodCard food={food} />
+                  <FoodCard 
+                    food={food} 
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
+                  />
                 </div>
               ))}
           </div>
@@ -330,7 +365,11 @@ const RecommendationPage = ({ params }) => {
                   onClick={() => handleFoodClick(food.id)}
                   className="cursor-pointer hover:scale-105 transition-transform"
                 >
-                  <FoodCard food={food} />
+                  <FoodCard 
+                    food={food} 
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
+                  />
                 </div>
               ))}
           </div>
@@ -351,7 +390,11 @@ const RecommendationPage = ({ params }) => {
                   onClick={() => handleFoodClick(food.id)}
                   className="cursor-pointer hover:scale-105 transition-transform"
                 >
-                  <FoodCard food={food} />
+                  <FoodCard 
+                    food={food} 
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
+                  />
                 </div>
               ))}
           </div>
@@ -372,7 +415,11 @@ const RecommendationPage = ({ params }) => {
                   onClick={() => handleFoodClick(food.id)}
                   className="cursor-pointer hover:scale-105 transition-transform"
                 >
-                  <FoodCard food={food} />
+                  <FoodCard 
+                    food={food} 
+                    favorites={favorites}
+                    onToggleFavorite={toggleFavorite}
+                  />
                 </div>
               ))}
           </div>
