@@ -35,6 +35,11 @@ export default function StatPage({ params }) {
     });
   }, [recData, timeFilter]);
 
+  if (loading) return <div>กำลังโหลด...</div>;
+  if (!recData || !Array.isArray(recData) || recData.length === 0)
+    return <div>ไม่มีประวัติ</div>;
+  if (error) return <div>เกิดข้อผิดพลาด: {error}</div>;
+
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("th-TH", options);
@@ -71,9 +76,7 @@ export default function StatPage({ params }) {
   return (
     <div className="flex justify-center min-h-screen pb-28">
       <div className="p-4 w-full max-w-6xl">
-        <h1 className="text-2xl font-bold mb-6 pb-2">
-          ประวัติการแนะนำอาหาร
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 pb-2">ประวัติการแนะนำอาหาร</h1>
 
         <div className="mb-6">
           <label htmlFor="timeFilter" className="text-lg font-medium mr-3">
@@ -101,12 +104,15 @@ export default function StatPage({ params }) {
               >
                 <span>{date}</span>
                 <span className="ml-2 text-gray-500">
-                  {openRecDate === date ? '▼' : '▶'}
+                  {openRecDate === date ? "▼" : "▶"}
                 </span>
               </h3>
               {openRecDate === date &&
                 groupedData[date].map((rec) => (
-                  <div key={rec.id} className="mb-6 bg-white rounded-lg p-4 shadow-sm">
+                  <div
+                    key={rec.id}
+                    className="mb-6 bg-white rounded-lg p-4 shadow-sm"
+                  >
                     <h4 className="text-lg font-medium mb-3 text-gray-700">
                       เวลา {formatTime(rec.timeStamp)}
                     </h4>

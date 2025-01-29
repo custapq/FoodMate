@@ -6,9 +6,9 @@ import useFoodData from "@/hooks/useFoodData";
 import useFoodsData from "@/hooks/useFoodsData";
 import useUserData from "@/hooks/useUserData";
 import FoodCard from "@/components/FoodCard";
-import Button from "@/components/Button";
 import useTodayRecommendation from "@/hooks/useTodayRecommendation";
-import { useSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
+import useFoodTag from "@/hooks/useFoodTag";
 
 import { calculateBMR, calculateTDEE } from "@/util/calculate";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -32,33 +32,33 @@ const checkCondition = (conditionId, nutrient) => {
   switch (conditionId) {
     case 1:
       switch (nutrient.nutrientId) {
-        case 4:
+        case 4: //fat
           return nutrient.amount > 17.5 ? -50 : 0;
-        case 11:
+        case 11: //sodium
           return nutrient.amount > 600 ? -50 : 0;
-        case 25:
+        case 25: //sugar
           return nutrient.amount > 22.5 ? -50 : 0;
         default:
           return 0;
       }
-    case 6:
-      switch (nutrient.nutrientId) {
-        case 25:
-          return nutrient.amount > 15 ? -50 : 0;
-        case 4:
-          return nutrient.amount > 10 ? -20 : 0;
-        default:
-          return 0;
-      }
-    case 8:
-      switch (nutrient.nutrientId) {
-        case 5:
-          return nutrient.amount < 1000 ? -20 : 0;
-        case 3:
-          return nutrient.amount > 800 ? -30 : 0;
-        default:
-          return 0;
-      }
+    // case 6:
+    //   switch (nutrient.nutrientId) {
+    //     case 25:
+    //       return nutrient.amount > 15 ? -50 : 0;
+    //     case 4:
+    //       return nutrient.amount > 10 ? -20 : 0;
+    //     default:
+    //       return 0;
+    //   }
+    // case 8:
+    //   switch (nutrient.nutrientId) {
+    //     case 5:
+    //       return nutrient.amount < 1000 ? -20 : 0;
+    //     case 3:
+    //       return nutrient.amount > 800 ? -30 : 0;
+    //     default:
+    //       return 0;
+    //   }
     default:
       return 0;
   }
@@ -69,28 +69,37 @@ const RecommendationPage = ({ params }) => {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  // console.log("session.user.id", session.user.id);
-  // console.log("id", id);
-  // console.log("parseInt(id)", parseInt(id));
-  // console.log("status", status);
-
   useEffect(() => {
-    if (status === "unauthenticated") {
-      console.log("unauthorized");
-      router.push("/");
-    } else if (session?.user?.id !== parseInt(id)) {
-      console.log("user id not match");
-      router.push("/");
-    }
-  }, [session?.user?.id, status, id, router]);
+    const checkSession = async () => {
+      const session = await getSession();
 
-  if (status !== "authenticated") {
-    return <div>Loading...</div>;
+      console.log("session from getSession:", session?.user?.id);
+      console.log("id:", id);
+      console.log("parseInt(id):", parseInt(id));
+
+      if (!session) {
+        console.log("unauthorized - no session");
+        router.push("/");
+        return;
+      }
+
+      if (session.user.id !== parseInt(id)) {
+        console.log("user id not match");
+        router.push("/");
+      }
+    };
+
+    checkSession();
+  }, [id, router]);
+
+  if (status === "loading") {
+    return <LoadingScreen />;
   }
 
   const { recommendations, loading, error } = useTodayRecommendation(id);
 
   const [selectedFoods, setSelectedFoods] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
 
   const { userData } = useUserData(id);
   const { foodsData } = useFoodsData();
@@ -109,6 +118,14 @@ const RecommendationPage = ({ params }) => {
   }, [userData, foodsData]);
 
   const { foodData, loadingFood, errorFood } = useFoodData(recommendedFoodIds);
+  const { foodTags, loading: loadingTags, error: errorTags } = useFoodTag(); // 🔹 ดึง FoodTags
+
+  const filteredFoodData = useMemo(() => {
+    if (!selectedTag) return foodData;
+    return foodData.filter((food) =>
+      food.foodTagList.some((tag) => tag.foodTag.id === selectedTag)
+    );
+  }, [foodData, selectedTag]);
 
   const currentEnergy = useMemo(() => {
     if (!recommendations || recommendations.length === 0) return 0;
@@ -168,7 +185,6 @@ const RecommendationPage = ({ params }) => {
         // ถ้ามี foodId อยู่แล้ว ให้ลบออก
         return prev.filter((id) => id !== foodId);
       } else {
-        // ถ้ายังไม่มี foodId ให้เพิ่มเข้าไป
         return [...prev, foodId];
       }
     });
@@ -214,7 +230,7 @@ const RecommendationPage = ({ params }) => {
           {updatedEnergy} / {Math.round(tdee)} kcal
         </span>
       </div>
-      <div className="container mx-auto mt-2">
+      <div className="container mx-auto my-2">
         <div className="bg-gray-200 rounded-full h-4 relative">
           <div
             className={`absolute h-4 transition-all duration-300 ease-in-out ${
@@ -277,104 +293,38 @@ const RecommendationPage = ({ params }) => {
           </div>
         )}
 
-        <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
-          อาหารทั้งหมด
-        </h2>
-        <div className="w-full overflow-x-auto">
-          <div className="flex space-x-4">
-            {foodData.map((food) => (
+        <div className="container mx-auto mt-2">
+          <select
+            value={selectedTag || ""}
+            onChange={(e) =>
+              setSelectedTag(e.target.value ? parseInt(e.target.value) : null)
+            }
+            className="p-2 border rounded"
+          >
+            <option value="">แสดงทั้งหมด</option>
+            {foodTags.map((tag) => (
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 🔹 แสดงรายการอาหาร */}
+        <div className="p-1 w-full max-w-6xl mx-auto">
+          <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
+            อาหารทั้งหมด
+          </h2>
+          <div className="grid grid-cols-4 gap-4">
+            {filteredFoodData.map((food) => (
               <div
                 key={food.id}
-                onClick={() => handleFoodClick(food.id)}
                 className="cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => handleFoodClick(food.id)}
               >
                 <FoodCard food={food} />
               </div>
             ))}
-          </div>
-        </div>
-
-        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
-          อาหารประเภทผัด
-        </h2>
-        <div className="w-full overflow-x-auto">
-          <div className="flex space-x-4">
-            {foodData
-              .filter((food) =>
-                food.foodTagList.some((tag) => tag.foodTag.id === 10)
-              )
-              .map((food) => (
-                <div
-                  key={food.id}
-                  onClick={() => handleFoodClick(food.id)}
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                >
-                  <FoodCard food={food} />
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
-          อาหารประเภทแกง
-        </h2>
-        <div className="w-full overflow-x-auto">
-          <div className="flex space-x-4">
-            {foodData
-              .filter((food) =>
-                food.foodTagList.some((tag) => tag.foodTag.id === 7)
-              )
-              .map((food) => (
-                <div
-                  key={food.id}
-                  onClick={() => handleFoodClick(food.id)}
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                >
-                  <FoodCard food={food} />
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
-          ก๋วยเตี๋ยว
-        </h2>
-        <div className="w-full overflow-x-auto">
-          <div className="flex space-x-4">
-            {foodData
-              .filter((food) =>
-                food.foodTagList.some((tag) => tag.foodTag.id === 6)
-              )
-              .map((food) => (
-                <div
-                  key={food.id}
-                  onClick={() => handleFoodClick(food.id)}
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                >
-                  <FoodCard food={food} />
-                </div>
-              ))}
-          </div>
-        </div>
-
-        <h2 className="text-xl font-semibold mt-8 mb-4 pb-2 border-b-2 border-orange-500">
-          อาหารจานเดียว
-        </h2>
-        <div className="w-full overflow-x-auto">
-          <div className="flex space-x-4">
-            {foodData
-              .filter((food) =>
-                food.foodTagList.some((tag) => tag.foodTag.id === 16)
-              )
-              .map((food) => (
-                <div
-                  key={food.id}
-                  onClick={() => handleFoodClick(food.id)}
-                  className="cursor-pointer hover:scale-105 transition-transform"
-                >
-                  <FoodCard food={food} />
-                </div>
-              ))}
           </div>
         </div>
       </div>
