@@ -100,6 +100,8 @@ const RecommendationPage = ({ params }) => {
 
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [selectedTag, setSelectedTag] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredFoods, setFilteredFoods] = useState([]);
 
   const { userData } = useUserData(id);
   const { foodsData } = useFoodsData();
@@ -120,12 +122,30 @@ const RecommendationPage = ({ params }) => {
   const { foodData, loadingFood, errorFood } = useFoodData(recommendedFoodIds);
   const { foodTags, loading: loadingTags, error: errorTags } = useFoodTag(); // 🔹 ดึง FoodTags
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  useEffect(() => {
+    const results = foodData.filter((food) =>
+      food.thaiName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredFoods(results);
+  }, [searchQuery, foodData]);
+
   const filteredFoodData = useMemo(() => {
+    if (searchQuery) {
+      return foodData.filter((food) =>
+        food.thaiName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
     if (!selectedTag) return foodData;
+
     return foodData.filter((food) =>
       food.foodTagList.some((tag) => tag.foodTag.id === selectedTag)
     );
-  }, [foodData, selectedTag]);
+  }, [foodData, selectedTag, searchQuery]);
 
   const currentEnergy = useMemo(() => {
     if (!recommendations || recommendations.length === 0) return 0;
@@ -293,7 +313,7 @@ const RecommendationPage = ({ params }) => {
           </div>
         )}
 
-        <div className="container mx-auto mt-2">
+        <div className="container mx-auto mt-2 flex gap-4 items-center">
           <select
             value={selectedTag || ""}
             onChange={(e) =>
@@ -308,9 +328,16 @@ const RecommendationPage = ({ params }) => {
               </option>
             ))}
           </select>
-        </div>
 
-        {/* 🔹 แสดงรายการอาหาร */}
+          <input
+            type="text"
+            placeholder="ค้นหาอาหาร..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="p-2 border rounded flex-1"
+          />
+        </div>
+        
         <div className="p-1 w-full max-w-6xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
             อาหารทั้งหมด
