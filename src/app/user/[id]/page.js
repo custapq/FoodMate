@@ -40,7 +40,7 @@ export default function UserPage({ params }) {
         <div className="mt-6">
           <Button 
             onClick={() => router.push(`/edit/${id}`)}
-            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+            className="w-full md:w-auto bg-orange-500 hover:bg-orange-700 text-white rounded-lg transition-colors duration-200"
           >
             แก้ไขข้อมูล
           </Button>

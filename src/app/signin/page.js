@@ -65,7 +65,7 @@ export default function SignIn() {
       <div className="mt-4 text-center">
         <p>
           ยังไม่มีบัญชี?{" "}
-          <Link href="/signup" className="text-blue-600 hover:text-blue-800">
+          <Link href="/signup" className="text-orange-500 hover:text-orange-800">
             สมัครสมาชิก
           </Link>
         </p>

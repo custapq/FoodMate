@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import InputText from "../../components/InputText"; // Import InputText component
-import Button from "@/components/Button"; // Import Button component
+import InputText from "../../components/InputText";
+import Button from "@/components/Button"; 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
@@ -13,13 +13,12 @@ export default function Signup() {
   // State สำหรับเก็บข้อมูลฟอร์ม
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // State สำหรับ Confirm Password
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSignup = async (event) => {
     event.preventDefault();
 
-    // ตรวจสอบว่า Password และ Confirm Password ตรงกัน
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -28,7 +27,6 @@ export default function Signup() {
     const userData = { email, password };
 
     try {
-      // 1. สร้าง User
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signup`,
         {
@@ -49,7 +47,6 @@ export default function Signup() {
       const userId = data.user.id;
       localStorage.setItem("userId", userId);
 
-      // 2. ทำการ Sign in อัตโนมัติ
       const signInResult = await signIn("credentials", {
         redirect: false,
         email,
@@ -60,7 +57,6 @@ export default function Signup() {
         throw new Error("Failed to sign in after signup");
       }
 
-      // 3. Redirect ไปยังหน้า create
       router.push(`/create`);
     } catch (error) {
       setError(error.message);

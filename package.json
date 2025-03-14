@@ -15,7 +15,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.2",
-    "@prisma/client": "^5.21.1",
+    "@prisma/client": "^6.5.0",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "my-app": "file:",
@@ -30,7 +30,7 @@
     "@svgr/webpack": "^8.1.0",
     "@types/node": "22.8.6",
     "postcss": "^8",
-    "prisma": "^5.21.1",
+    "prisma": "^6.5.0",
     "tailwindcss": "^3.4.1",
     "typescript": "5.6.3"
   }

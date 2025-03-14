@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import useRecommendationData from "../../../../hooks/useRecommendationData";
 import FoodCard from "../../../../components/FoodCard";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function StatPage({ params }) {
   const { id } = params;
@@ -35,7 +36,11 @@ export default function StatPage({ params }) {
     });
   }, [recData, timeFilter]);
 
-  if (loading) return <div>กำลังโหลด...</div>;
+  const isLoading = loading;
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
   if (!recData || !Array.isArray(recData) || recData.length === 0)
     return <div>ไม่มีประวัติ</div>;
   if (error) return <div>เกิดข้อผิดพลาด: {error}</div>;
@@ -66,7 +71,7 @@ export default function StatPage({ params }) {
   };
 
   // เช็คสถานะการโหลด ข้อผิดพลาด และข้อมูล
-  if (loading) return <div>กำลังโหลด...</div>;
+
   if (error) return <div>เกิดข้อผิดพลาด: {error}</div>;
   if (!recData || !Array.isArray(recData))
     return <div>ไม่มีข้อมูลที่ถูกต้อง</div>;

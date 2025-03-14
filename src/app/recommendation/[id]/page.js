@@ -126,12 +126,12 @@ const RecommendationPage = ({ params }) => {
     setSearchQuery(event.target.value);
   };
 
-  useEffect(() => {
-    const results = foodData.filter((food) =>
-      food.thaiName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredFoods(results);
-  }, [searchQuery, foodData]);
+  // useEffect(() => {
+  //   const results = foodData.filter((food) =>
+  //     food.thaiName.toLowerCase().includes(searchQuery.toLowerCase())
+  //   );
+  //   setFilteredFoods(results);
+  // }, [searchQuery, foodData]);
 
   const filteredFoodData = useMemo(() => {
     if (searchQuery) {
@@ -337,7 +337,7 @@ const RecommendationPage = ({ params }) => {
             className="p-2 border rounded flex-1"
           />
         </div>
-        
+
         <div className="p-1 w-full max-w-6xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 pb-2 border-b-2 border-orange-500">
             อาหารทั้งหมด

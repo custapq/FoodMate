@@ -66,7 +66,7 @@ export default function EditUser({ params }) {
       setHeight(userData.height);
       setGoal(userData.goal);
       setExercise(userData.exercise);
-      setCondition(userData.condition); // สมมติว่า userData.condition เป็นอาเรย์ของ condition IDs
+      setCondition(userData.condition);
     };
     loadUserData();
   }, [id]);
@@ -88,7 +88,7 @@ export default function EditUser({ params }) {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/${id}`,
         {
-          method: "PUT", // ใช้ PUT สำหรับการอัปเดต
+          method: "PUT", 
           headers: {
             "Content-Type": "application/json",
           },
@@ -103,7 +103,7 @@ export default function EditUser({ params }) {
       const data = await res.json();
       console.log("User updated:", data);
 
-      router.push(`/user/${id}`); // กลับไปที่หน้า UserInfo
+      router.push(`/user/${id}`); 
     } catch (error) {
       console.error("Error submitting form:", error);
     }
