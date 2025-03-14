@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+🍽️ Foodmate
 
-## Getting Started
+Foodmate เป็นเว็บแอปพลิเคชันที่ช่วยแนะนำอาหารตามเงื่อนไขของผู้ใช้ โดยคำนวณข้อมูลทางโภชนาการและติดตามการบริโภคของผู้ใช้ เพื่อช่วยให้พวกเขาควบคุมสุขภาพได้ดีขึ้น
 
-First, run the development server:
+✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- ผู้ใช้สามารถป้อนข้อมูลส่วนตัวเพื่อใช้คำนวณทางโภชนาการ
+
+- ค้นหาและเลือกอาหารจากหมวดหมู่ต่างๆ เช่น อาหารหลัก, ของทอด, ขนมหวาน และเครื่องดื่ม
+
+- ระบบติดตามประวัติการบริโภค (รายวัน, รายสัปดาห์, รายเดือน)
+
+- ระบบค้นหาอาหารตามชื่อและตัวกรองหมวดหมู่
+
+- แสดงปริมาณสารอาหารที่บริโภคและที่ต้องการในแต่ละวัน
+
+- แนะนำอาหารที่เหมาะสมกับผู้ใช้โดยใช้ FoodTag
+
+🔨 Tech Stack
+
+- Framework: Next.js
+
+- Database: PostgreSQL (Prisma ORM)
+
+- Authentication: NextAuth.js
+
+- CSS Framework: Tailwind CSS
+
+💻 Installation
+
+1. Clone the repository
+```
+git clone https://github.com/custapq/foodmate.git
+cd foodmate
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+1. Install dependencies
+```
+npm install
+```
+1. Set up environment variables
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+สร้างไฟล์ .env และกำหนดค่าต่อไปนี้:
+```
+DATABASE_URL=postgresql://your-db-url
+NEXTAUTH_SECRET=your-secret-key
+NEXTAUTH_URL=http://localhost:3000
+```
+4. Run database migration
+```
+npx prisma migrate dev
+```
+5. Start the development server
+```
+npm run dev
+```
+Usage
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+เปิดเว็บแอปพลิเคชันที่ http://localhost:3000
 
-## Learn More
+- ลงทะเบียนหรือเข้าสู่ระบบ
 
-To learn more about Next.js, take a look at the following resources:
+- ป้อนข้อมูลส่วนตัวเพื่อเริ่มติดตามโภชนาการ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- ค้นหาและเลือกอาหารที่ต้องการ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- ดูข้อมูลแนะนำและติดตามการบริโภคของคุณ
 
-## Deploy on Vercel
+Future Development
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- เพิ่มการรองรับ AI ในการวิเคราะห์พฤติกรรมการกิน
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- รองรับการแนะนำอาหารตามเงื่อนไขสุขภาพเฉพาะ
+
+- พัฒนาแอปมือถือสำหรับ iOS และ Android
